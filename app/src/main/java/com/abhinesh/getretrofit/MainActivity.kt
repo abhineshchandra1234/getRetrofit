@@ -19,18 +19,32 @@ class MainActivity : AppCompatActivity() {
         val repository = Repository()
         val viewModelFactory = MainViewModelFactory(repository)
         viewModel = ViewModelProvider(this,viewModelFactory).get(MainViewModel::class.java)
-        viewModel.getPost()
-        viewModel.myResponse.observe(this, Observer { response ->
-            if (response.isSuccessful){
-                Log.d("Response",response.body()?.userId.toString())
-                Log.d("Response",response.body()?.id.toString())
-                Log.d("Response",response.body()?.title!!)
-                tvHello.text = response.body()?.title
-                Log.d("Response",response.body()?.body!!)
-            } else {
-                Log.d("Response",response.errorBody().toString())
-                tvHello.text = response.code().toString()
-            }
-        })
+        //viewModel.getPost()
+
+        val options: HashMap<String,String> = HashMap()
+        options["_sort"] = "id"
+        options["_order"] = "desc"
+
+
+
+        button.setOnClickListener {
+            val myNumber = number_editText.text.toString()
+            viewModel.getCustomPosts2(Integer.parseInt(myNumber), options)//asc//desc
+
+            viewModel.myCustomPosts2.observe(this, Observer { response ->
+                if (response.isSuccessful){
+                    tvHello.text = response.body().toString()
+                    response.body()?.forEach {
+                        Log.d("Response",it.userId.toString())
+                        Log.d("Response",it.id.toString())
+                        Log.d("Response",it.title)
+                        Log.d("Response",it.body)
+                        Log.d("Response","-------------------------------")
+                    }
+                } else {
+                    tvHello.text = response.code().toString()
+                }
+            })
+        }
     }
 }
